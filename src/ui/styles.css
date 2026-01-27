@@ -1,0 +1,399 @@
+/* استيراد خط تجوال (Cairo) */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+
+/* ==========================================================================
+   THEME VARIABLES (محددات الألوان)
+   سيتم تغذية هذه القيم ديناميكياً من البايثون، لكن نضع قيم افتراضية هنا
+   ========================================================================== */
+:root {
+    --font-main: 'Cairo', sans-serif;
+    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* تطبيق الخط */
+html,
+body,
+[class*="css"] {
+    font-family: var(--font-main) !important;
+}
+
+/* ==========================================================================
+   GLOBAL LAYOUT (الهيكلية العامة)
+   ========================================================================== */
+.stApp {
+    direction: rtl;
+    text-align: right;
+    background-color: var(--bg-main, #ffffff);
+    color: var(--text-primary, #0f172a);
+}
+
+/* Main Content Area */
+.stMain {
+    padding-top: 2rem;
+}
+
+/* ==========================================================================
+   SIDEBAR (الشريط الجانبي)
+   ========================================================================== */
+[data-testid="stSidebar"] {
+    right: 0;
+    left: auto;
+    border-left: 1px solid var(--border-color, #e2e8f0);
+    border-right: none;
+    background-color: var(--bg-sidebar, #f8fafc);
+    direction: rtl !important;
+    /* إجبار الاتجاه */
+    text-align: right !important;
+}
+
+/* عناصر النصوص في الشريط الجانبي */
+[data-testid="stSidebar"] [data-testid="stMarkdown"],
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3,
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] div {
+    color: var(--text-primary, #0f172a) !important;
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* زر إغلاق الشريط */
+[data-testid="stSidebarCollapsedControl"] {
+    right: auto;
+    left: 20px;
+    background-color: var(--bg-sidebar, #f8fafc);
+    color: var(--text-primary, #0f172a);
+    border: 1px solid var(--border-color, #e2e8f0);
+}
+
+/* ==========================================================================
+   HEADER FIXES (إصلاح الشريط العلوي)
+   ========================================================================== */
+[data-testid="stHeader"] {
+    background-color: transparent !important;
+    /* جعل الخلفية شفافة لتأخذ لون الصفحة */
+    z-index: 100;
+}
+
+/* إخفاء الخط الملون الافتراضي لستريم ليت */
+[data-testid="stDecoration"] {
+    display: none;
+}
+
+/* ==========================================================================
+   CHAT BUBBLES (فقاعات المحادثة)
+   ========================================================================== */
+/* ==========================================================================
+   CHAT BUBBLES (فقاعات المحادثة)
+   ========================================================================== */
+/* رسالة المستخدم */
+[data-testid="stChatMessage"]:nth-child(odd) {
+    background-color: var(--msg-user-bg, #eff6ff);
+    border: 1px solid var(--msg-user-border, #dbeafe);
+    border-radius: 16px 16px 0 16px;
+    direction: rtl !important;
+}
+
+/* رسالة النظام */
+[data-testid="stChatMessage"]:nth-child(even) {
+    background-color: var(--msg-bot-bg, #ffffff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 16px 16px 16px 0;
+    direction: rtl !important;
+}
+
+/* الأفاتار */
+.stChatMessageAvatar {
+    margin-left: 12px;
+    margin-right: 0;
+    border: 2px solid var(--border-color, #e2e8f0);
+    background-color: var(--card-bg, #ffffff);
+    float: right !important;
+    /* ضمان وجود الأفاتار يمين */
+}
+
+/* المنطقة الحاوية للنص داخل الرسالة */
+[data-testid="stChatMessageContent"] {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* نصوص الرسائل - إجبار الاتجاه لكل العناصر */
+[data-testid="stChatMessage"] p,
+[data-testid="stChatMessage"] div,
+[data-testid="stChatMessage"] li,
+[data-testid="stChatMessage"] span {
+    color: var(--text-primary, #0f172a) !important;
+    line-height: 1.6;
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* استثناء للكود البرمجي ليظهر LTR */
+[data-testid="stChatMessage"] code,
+[data-testid="stChatMessage"] pre {
+    direction: ltr !important;
+    text-align: left !important;
+    font-family: 'Consolas', 'Monaco', monospace !important;
+}
+
+/* ==========================================================================
+   COMPONENTS (المكونات)
+   ========================================================================== */
+/* بطاقات المصادر */
+.source-card {
+    background-color: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: var(--border-radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: var(--transition);
+    border-right: 4px solid var(--primary-color, #0ea5e9);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.source-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    border-color: var(--secondary-color, #0284c7);
+}
+
+.source-card .source-title {
+    color: var(--primary-color, #0ea5e9);
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.source-card .source-content {
+    color: var(--text-secondary, #475569) !important;
+    font-size: 0.9rem;
+}
+
+/* صندوق التفكير (Expander) */
+[data-testid="stExpander"] {
+    border: 1px solid var(--border-color, #e2e8f0);
+    background-color: var(--card-bg, #ffffff);
+    border-radius: var(--border-radius);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+[data-testid="stExpander"] details summary {
+    color: var(--primary-color, #0ea5e9) !important;
+    font-weight: 600;
+}
+
+/* محتوى القائمة المنسدلة */
+[data-testid="stExpander"] div {
+    color: var(--text-secondary, #475569) !important;
+}
+
+[data-testid="stExpander"] details summary:hover {
+    color: var(--secondary-color, #0284c7) !important;
+}
+
+/* عند الفتح */
+[data-testid="stExpander"] details[open] summary {
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* ==========================================================================
+   INPUTS & BUTTONS (الأزرار والمدخلات)
+   ========================================================================== */
+/* تثبيت خلفية المنطقة السفلية بالكامل - إصلاح الشريط الأسود */
+[data-testid="stBottom"] {
+    background-color: transparent !important;
+}
+
+[data-testid="stBottom"]>div {
+    background-color: transparent !important;
+}
+
+/* ==========================================================================
+   إصلاح شامل لحقل الإدخال وإزالة اللون الظاهر خلف النص
+   ========================================================================== */
+/* حاوية حقل الإدخال الخارجية */
+.stChatInput,
+.stChatInput>div,
+[data-testid="stChatInput"],
+[data-testid="stChatInput"]>div {
+    background-color: var(--card-bg, #ffffff) !important;
+    border: 1px solid var(--border-color, #e2e8f0) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* إزالة الحدود المزدوجة */
+.stChatInput>div>div,
+[data-testid="stChatInput"]>div>div {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+/* حقل الإدخال textarea والعناصر الداخلية */
+.stChatInput textarea,
+.stChatInput input,
+[data-testid="stChatInput"] textarea,
+[data-testid="stChatInput"] input,
+[data-testid="stChatInputTextArea"],
+[data-testid="stChatInputTextArea"] textarea {
+    background-color: transparent !important;
+    background: transparent !important;
+    color: var(--text-primary, #0f172a) !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0.5rem !important;
+    caret-color: var(--primary-color, #0ea5e9) !important;
+}
+
+/* إزالة خلفية placeholder */
+.stChatInput textarea::placeholder,
+[data-testid="stChatInput"] textarea::placeholder {
+    color: var(--text-secondary, #64748b) !important;
+    opacity: 0.7 !important;
+}
+
+/* جميع العناصر الداخلية لحقل الإدخال */
+.stChatInput *,
+[data-testid="stChatInput"] * {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+/* إعادة تعيين خلفية الحاوية الرئيسية فقط */
+.stChatInput>div:first-child,
+[data-testid="stChatInput"]>div:first-child {
+    background-color: var(--card-bg, #ffffff) !important;
+}
+
+/* زر الإرسال */
+.stChatInput button,
+[data-testid="stChatInput"] button,
+[data-testid="stChatInputSubmitButton"] {
+    background-color: var(--primary-color, #0ea5e9) !important;
+    background: var(--primary-color, #0ea5e9) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+}
+
+.stChatInput button:hover,
+[data-testid="stChatInput"] button:hover {
+    background-color: var(--secondary-color, #0284c7) !important;
+    background: var(--secondary-color, #0284c7) !important;
+}
+
+/* ==========================================================================
+   SIDEBAR BUTTONS (أزرار الشريط الجانبي)
+   ========================================================================== */
+/* 1. زر تبديل الثيم - تصميم صلب */
+[data-testid="stSidebar"] [data-testid="stButton"]:nth-of-type(1) button {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    transition: all 0.2s ease !important;
+    font-weight: 700 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"]:nth-of-type(1) button p {
+    color: var(--text-primary) !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"]:nth-of-type(1) button:hover {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: #ffffff !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"]:nth-of-type(1) button:hover p {
+    color: #ffffff !important;
+}
+
+/* 2. زر محادثة جديدة */
+[data-testid="stSidebar"] [data-testid="stButton"]:nth-of-type(2) button {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2) !important;
+    transition: transform 0.2s ease !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"]:nth-of-type(2) button p {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"]:nth-of-type(2) button:hover {
+    opacity: 0.9 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 8px -1px rgba(239, 68, 68, 0.3) !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"] button:active {
+    transform: scale(0.98) !important;
+}
+
+/* ==========================================================================
+   GHOST SIDEBAR FIX (إصلاح مشكلة الشريط الجانبي عند الإغلاق)
+   ========================================================================== */
+/* تأكد من أن الـSection نفسه يخفي نفسه */
+/* عندما يكون الشريط مغلقاً: إجبار الإخفاء والتحريك لليمين */
+section[data-testid="stSidebar"][aria-expanded="false"] {
+    width: 0 !important;
+    flex: 0 !important;
+    transform: translateX(100%) !important;
+    /* تحريك لليمين خارج الشاشة */
+    /* تمت إزالة الهامش السلبي لأنه يسحب المحتوى */
+}
+
+/* إذا كان هناك حاوية داخلية */
+section[data-testid="stSidebar"][aria-expanded="false"]>div {
+    width: 0 !important;
+    opacity: 0 !important;
+}
+
+/* تحسين زر الفتح */
+[data-testid="stSidebarCollapsedControl"] {
+    left: 20px !important;
+    right: auto !important;
+    z-index: 99999 !important;
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   MARKDOWN FIXES (إصلاحات النصوص)
+   ========================================================================== */
+.stMarkdown ul,
+.stMarkdown ol,
+.stMarkdown li {
+    direction: rtl !important;
+    text-align: right !important;
+    list-style-position: inside !important;
+}
+
+.stMarkdown ul li::marker {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   HEADER (الترويسة)
+   ========================================================================== */
+h1 {
+    color: var(--text-primary, #0f172a);
+    font-weight: 800;
+}
+
+p.subtitle {
+    color: var(--text-secondary, #64748b);
+}

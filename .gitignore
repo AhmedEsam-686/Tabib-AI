@@ -1,0 +1,19 @@
+# استثناء مجلد الموديل الضخم
+Qwen3-4B-Thinking-2507-FP8/
+
+# استثناء مجلد قاعدة البيانات
+chroma_db_storage/
+
+dataset/
+
+medical_data_cleaned.csv
+
+train_data.txt
+
+# استثناء ملفات الكاش المؤقتة لبايثون
+__pycache__/
+*/__pycache__/
+*.pyc
+
+# استثناء نقاط حفظ نوتبوك (إن وجدت)
+.ipynb_checkpoints/
