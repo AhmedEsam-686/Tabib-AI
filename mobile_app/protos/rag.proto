@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package medical_rag;
+
+// خدمة الشات الطبي
+service MedicalChatService {
+  // دالة واحدة تقبل تاريخ المحادثة وتعيد رداً متدفقاً (Streaming)
+  rpc GenerateStream (ChatRequest) returns (stream ChatResponse) {}
+}
+
+message ChatRequest {
+  string session_id = 1;      // معرف للجلسة (اختياري)
+  repeated Message messages = 2; // سجل المحادثة كاملًا
+  GenerationConfig config = 3;   // إعدادات التوليد
+}
+
+message Message {
+  string role = 1;    // "system", "user", "assistant"
+  string content = 2; // النص
+}
+
+message GenerationConfig {
+  int32 max_tokens = 1;
+  float temperature = 2;
+  float top_p = 3;
+}
+
+message ChatResponse {
+  string token = 1;      // الكلمة المولدة
+  bool is_finished = 2;  // هل انتهى الرد؟
+}

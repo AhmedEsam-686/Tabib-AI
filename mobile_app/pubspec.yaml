@@ -42,6 +42,9 @@ dependencies:
   # State Management & Logic
   provider: ^6.1.2
   uuid: ^4.3.3
+  grpc: ^5.1.0
+  protobuf: ^6.0.0
+
 
 dev_dependencies:
   flutter_test:

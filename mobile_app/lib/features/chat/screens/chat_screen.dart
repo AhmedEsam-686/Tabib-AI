@@ -1,9 +1,11 @@
+// lib/features/chat/screens/chat_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:tabib_app/features/chat/models/message.dart';
-
+import '../../../core/config/app_config.dart';
+import '../../../core/providers/theme_provider.dart';
 import '../providers/chat_provider.dart';
 import '../widgets/message_bubble.dart';
 import '../../../core/theme/app_theme.dart';
@@ -13,29 +15,36 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               "المساعد الطبي الذكي",
-              style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+              style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 18),
             ),
-            Text(
-              "متصل (وضع المحاكاة)",
-              style: GoogleFonts.cairo(fontSize: 12, color: Colors.green),
-            ),
+            if (!AppConfig.useMockService)
+              Text(
+                "متصل (السيرفر الحقيقي)",
+                style: GoogleFonts.cairo(fontSize: 12, color: Colors.green),
+              ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_outline),
-            onPressed: () => context.read<ChatProvider>().clearChat(),
+        centerTitle: false, // User asked for start alignment (implied by "not in the middle")
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu_rounded),
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
-          IconButton(icon: const Icon(Icons.info_outline), onPressed: () {}),
-        ],
+        ),
       ),
+      drawer: _buildDrawer(context),
       body: Column(
         children: [
           // Chat List
@@ -44,55 +53,14 @@ class ChatScreen extends StatelessWidget {
               builder: (context, provider, child) {
                 final messages = provider.messages;
 
-                // Show current stream buffer as a temporary message if loading
-                final showStream =
-                    provider.isLoading &&
-                    provider.currentStreamBuffer.isNotEmpty;
-
                 return ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  itemCount: messages.length + (showStream ? 1 : 0),
+                  padding: const EdgeInsets.only(bottom: 20, top: 10),
+                  itemCount: messages.length,
                   itemBuilder: (context, index) {
-                    if (index < messages.length) {
-                      return FadeInUp(
-                        duration: const Duration(milliseconds: 300),
-                        child: MessageBubble(message: messages[index]),
-                      );
-                    } else {
-                      // Live Streaming Message
-                      // We create a temporary message to render the streaming content
-                      // including <think> tags handling if implemented in Bubble,
-                      // but for now let's just show raw text or parse simple
-
-                      // Simple check for now:
-                      String content = provider.currentStreamBuffer;
-                      String? thinking;
-
-                      if (content.contains("</think>")) {
-                        final parts = content.split("</think>");
-                        thinking = parts[0].replaceFirst("<think>", "").trim();
-                        content = parts.length > 1 ? parts[1] : "";
-                      } else if (content.contains("<think>")) {
-                        thinking = content.replaceFirst("<think>", "").trim();
-                        content = ""; // Still in thinking phase
-                      }
-
-                      // If entirely thinking, show as such
-                      if (content.isEmpty && thinking == null)
-                        return const SizedBox();
-
-                      return FadeIn(
-                        child: MessageBubble(
-                          message: ChatMessage(
-                            id: "stream",
-                            content: content,
-                            role: MessageRole.assistant,
-                            timestamp: DateTime.now(),
-                            thinkingContent: thinking,
-                          ),
-                        ),
-                      );
-                    }
+                    return FadeInUp(
+                      duration: const Duration(milliseconds: 300),
+                      child: MessageBubble(message: messages[index]),
+                    );
                   },
                 );
               },
@@ -106,43 +74,127 @@ class ChatScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: Column(
+        children: [
+          UserAccountsDrawerHeader(
+            decoration: const BoxDecoration(
+              color: AppTheme.backgroundDark,
+            ),
+            currentAccountPicture: Container(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppTheme.primary,
+              ),
+              child: const Icon(Icons.medical_services_outlined, color: Colors.white, size: 30),
+            ),
+            accountName: Text("Tabib AI", style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+            accountEmail: Text("v2.1 | Medical Assistant", style: GoogleFonts.cairo(fontSize: 12, color: Colors.grey)),
+          ),
+          ListTile(
+            leading: const Icon(Icons.add_comment_outlined, color: AppTheme.secondary),
+            title: Text("محادثة جديدة", style: GoogleFonts.cairo()),
+            onTap: () {
+              context.read<ChatProvider>().clearChat();
+              Navigator.pop(context);
+            },
+          ),
+          const Divider(),
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, _) {
+              final isDark = themeProvider.isDarkMode;
+              return ListTile(
+                leading: Icon(
+                    isDark ? Icons.wb_sunny_outlined : Icons.nightlight_round,
+                    color: isDark ? Colors.orange : Colors.indigo),
+                title: Text(isDark ? "الوضع النهاري" : "الوضع الليلي",
+                    style: GoogleFonts.cairo()),
+                onTap: () {
+                  context.read<ThemeProvider>().toggleTheme();
+                },
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInputArea(BuildContext context) {
     final textController = TextEditingController();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Reduced outer padding
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
+        color: theme.scaffoldBackgroundColor,
+        border: Border(top: BorderSide(color: theme.dividerColor.withOpacity(0.1))),
       ),
       child: SafeArea(
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: textController,
-                decoration: const InputDecoration(
-                  hintText: "اكتب سؤالك الطبي هنا...",
-                  prefixIcon: Icon(Icons.medical_services_outlined),
+        child: Container(
+          decoration: BoxDecoration(
+            // Use lighter color for light mode, deep dark for dark mode
+            color: isDark ? const Color(0xFF111827) : const Color(0xFFF1F5F9), 
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: theme.dividerColor.withOpacity(isDark ? 0.05 : 0.5)),
+          ),
+          padding: const EdgeInsets.only(left: 8, right: 8, top: 0, bottom: 0), // Minimal internal padding
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: textController,
+                  // Adaptive text color
+                  style: GoogleFonts.cairo(
+                    color: theme.textTheme.bodyMedium?.color, 
+                    fontSize: 14,
+                    height: 1.2, // Tighter line height
+                  ),
+                  decoration: InputDecoration(
+                    hintText: "اكتب سؤالك الطبي هنا...",
+                    hintStyle: GoogleFonts.cairo(
+                      color: theme.hintColor.withOpacity(0.6), 
+                      fontSize: 13
+                    ),
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), // Adjust content padding
+                    filled: false,
+                    isDense: true,
+                  ),
+                  onSubmitted: (_) {
+                    final text = textController.text;
+                    textController.clear();
+                    context.read<ChatProvider>().sendMessage(text);
+                  },
                 ),
-                onSubmitted: (_) {
-                  final text = textController.text;
-                  textController.clear();
-                  context.read<ChatProvider>().sendMessage(text);
-                },
               ),
-            ),
-            const SizedBox(width: 12),
-            FloatingActionButton(
-              onPressed: () {
-                final text = textController.text;
-                textController.clear();
-                context.read<ChatProvider>().sendMessage(text);
-              },
-              backgroundColor: AppTheme.primary,
-              child: const Icon(Icons.send_rounded, color: Colors.white),
-            ),
-          ],
+              const SizedBox(width: 4),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),// Very small margin
+                height: 35, // Small button size
+                width: 35,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_upward_rounded, color: Colors.white, size: 20), // Small icon
+                  onPressed: () {
+                    final text = textController.text;
+                    textController.clear();
+                    context.read<ChatProvider>().sendMessage(text);
+                  },
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32), // Tiny button
+                  padding: EdgeInsets.zero,
+                  tooltip: 'إرسال',
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

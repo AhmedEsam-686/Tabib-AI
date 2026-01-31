@@ -23,29 +23,33 @@ class MessageBubble extends StatelessWidget {
       alignment: AlignmentDirectional.centerEnd,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.8,
+          maxWidth: MediaQuery.of(context).size.width * 0.85,
         ),
         decoration: BoxDecoration(
           color: AppTheme.primary,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
-            topRight: Radius.circular(4),
+            topRight: Radius.circular(20),
             bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
+            bottomRight: Radius.circular(4),
           ),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primary.withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Text(
           message.content,
-          style: GoogleFonts.cairo(color: Colors.white, fontSize: 16),
+          style: GoogleFonts.cairo(
+            color: Colors.white,
+            fontSize: 15,
+            height: 1.5,
+          ),
         ),
       ),
     );
@@ -54,81 +58,103 @@ class MessageBubble extends StatelessWidget {
   Widget _buildAssistantMessage(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-
+    
     return Align(
       alignment: AlignmentDirectional.centerStart,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.9,
+          maxWidth: MediaQuery.of(context).size.width * 0.85, // Reduced width to avoid "stretched" look
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header: Icon + Name
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: theme.cardColor,
+                    color: AppTheme.primary.withOpacity(0.1),
                     shape: BoxShape.circle,
-                    border: Border.all(color: theme.dividerColor),
                   ),
-                  child: const Text("🩺", style: TextStyle(fontSize: 20)),
+                  child: const Text("🩺", style: TextStyle(fontSize: 18)),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Text(
-                  "المساعد الطبي",
+                  "المساعد الطبي الذكي",
                   style: GoogleFonts.cairo(
                     fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
+                    fontSize: 14,
+                    color: AppTheme.secondary,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(4),
-                  topRight: Radius.circular(20),
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-                border: Border.all(color: theme.dividerColor),
-              ),
+            const SizedBox(height: 6), // Reduced vertical spacing
+            
+            // Content
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // reasoning section (if exists)
+                  // Thinking Section
                   if (message.thinkingContent != null)
-                    _buildReasoningBox(context, message.thinkingContent!),
+                    _buildReasoningBox(context, message.thinkingContent!, message.isThinking),
 
                   if (message.thinkingContent != null)
-                    const Divider(height: 24),
+                    const SizedBox(height: 6), // Reduced spacing between thinking and card
 
-                  MarkdownBody(
-                    data: message.content,
-                    selectable: true,
-                    styleSheet: MarkdownStyleSheet(
-                      p: GoogleFonts.cairo(
-                        fontSize: 16,
-                        height: 1.6,
-                        color: theme.colorScheme.onSurface,
+                  // Main Response - Valid Template
+                  Container(
+                    padding: const EdgeInsets.all(14), // Reduced padding inside card
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        topRight: Radius.circular(16),
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
                       ),
-                      h1: GoogleFonts.cairo(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.primary,
+                      border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
+                    ),
+                    child: MarkdownBody(
+                      data: message.content,
+                      selectable: true,
+                      styleSheet: MarkdownStyleSheet(
+                        p: GoogleFonts.cairo(
+                          fontSize: 15, // Slightly smaller font
+                          height: 1.6,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        h1: GoogleFonts.cairo(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.secondary,
+                        ),
+                        h2: GoogleFonts.cairo(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurface, // Adapt to theme
+                        ),
+                        h3: GoogleFonts.cairo(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        ),
+                        listBullet: const TextStyle(color: AppTheme.secondary),
+                        code: GoogleFonts.robotoMono(
+                          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.grey[200],
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                        blockquote: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                        blockquoteDecoration: BoxDecoration(
+                          border: Border(right: BorderSide(color: AppTheme.secondary, width: 4)),
+                          color: isDark ? const Color(0xFF1E293B) : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
-                      h2: GoogleFonts.cairo(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.primaryDark,
-                      ),
-                      listBullet: TextStyle(color: AppTheme.secondary),
                     ),
                   ),
                 ],
@@ -140,33 +166,52 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildReasoningBox(BuildContext context, String reasoning) {
-    return Theme(
-      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+  Widget _buildReasoningBox(BuildContext context, String content, bool isThinking) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: isDark 
+            ? const Color(0xFF1E293B).withOpacity(0.5) 
+            : const Color(0xFFE2E8F0), // Lighter grey for light mode
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: theme.dividerColor.withOpacity(isDark ? 0.05 : 0.1),
+        ),
+      ),
       child: ExpansionTile(
+        tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+        shape: const Border(), // Remove default borders
+        collapsedShape: const Border(),
+        leading: Icon(
+          Icons.psychology_outlined, 
+          color: theme.hintColor, 
+          size: 20
+        ),
         title: Text(
-          "Reasoning",
+          isThinking ? "جاري التفكير..." : "تم تحليل الاستفسار",
           style: GoogleFonts.cairo(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.secondary,
+            fontSize: 13, 
+            color: theme.hintColor,
+            fontWeight: FontWeight.w600
           ),
         ),
-        leading: const Icon(Icons.psychology, color: AppTheme.secondary),
-        backgroundColor: AppTheme.secondary.withOpacity(0.05),
-        collapsedBackgroundColor: AppTheme.secondary.withOpacity(0.05),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        collapsedShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        childrenPadding: const EdgeInsets.all(12),
+        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
-          Text(
-            reasoning,
-            style: GoogleFonts.cairo(
-              fontSize: 13,
-              color: Colors.grey[600],
-              fontStyle: FontStyle.italic,
+          MarkdownBody(
+            data: content,
+            styleSheet: MarkdownStyleSheet(
+              p: GoogleFonts.cairo(
+                fontSize: 13, 
+                color: theme.textTheme.bodySmall?.color,
+                height: 1.5
+              ),
+              code: GoogleFonts.robotoMono(
+                  fontSize: 12,
+                  backgroundColor: Colors.transparent,
+              ),
             ),
           ),
         ],
